@@ -1,1 +1,1 @@
-# sugoroku
+# pygameを用いたすごろく
