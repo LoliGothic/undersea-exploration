@@ -1,3 +1,2 @@
 # pygameを用いたすごろく
-test
-sugorokugame
+# pulltest
