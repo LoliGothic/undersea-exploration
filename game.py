@@ -437,9 +437,11 @@ class Game:
     for player in self.players:
       if self.oxygen > 0:
         if self.oxygen - (1 + player.food) < 0:
-          self.oxgen = 0
+          self.oxygen = 0
+          print("ccc")
         else:
           self.oxygen -= (1 + player.food)
+          print("bbbb")
         dice = random.randint(3, 8) - player.food
         self.map.draw("Dice:" + str(dice) + "   oxygen:" + str(self.oxygen), str(player.playerName) + "   food:" + str(player.food), 20, 20, 20, 60)
 
