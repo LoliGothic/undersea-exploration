@@ -70,9 +70,9 @@ class Map:
     self.screen = screen
 
   # マップを描画
-  def draw(self, string, positionX, positionY):
+  def draw(self, gameInfo, playerInfo, positionText1X, positionText1Y, positionText2X, positionText2Y):
 
-    self.drawString(string, positionX, positionY)
+    self.drawString(gameInfo, playerInfo, positionText1X, positionText1Y, positionText2X, positionText2Y)
 
     maxWidth = self.height // self.tileSize
     maxHeight = self.width // self.tileSize
@@ -90,11 +90,13 @@ class Map:
       self.screen.blit(img, (i * self.tileSize, j * self.tileSize + 90))
     pygame.display.update()
   
-  def drawString(self, string, positionX, positionY):
+  def drawString(self, gameInfo, playerInfo, positionText1X, positionText1Y, positionText2X, positionText2Y):
     self.screen.fill((0,0,0))
-    font = pygame.font.Font(None, 45)
-    text = font.render(string, True, (255,255,255))
-    self.screen.blit(text, [positionX, positionY])
+    font = pygame.font.Font(None, 30)
+    text1 = font.render(gameInfo, True, (255,255,255))
+    text2 = font.render(playerInfo, True, (255,255,255))
+    self.screen.blit(text1, [positionText1X, positionText1Y])
+    self.screen.blit(text2, [positionText2X, positionText2Y])
     
 class Actor:
   food = 0
@@ -102,11 +104,12 @@ class Actor:
   formerImg = "s"
   goal = False
 
-  def __init__(self, map, x, y, pNumber):
+  def __init__(self, map, x, y, pNumber, playerName):
     self.map = map
     self.x = x
     self.y = y
     self.pNumber = pNumber
+    self.playerName = playerName
 
   def keyMove(self):
     time.sleep(0.3)
@@ -365,10 +368,16 @@ class Actor:
           self.formerImg = "f1"
         
       elif self.formerImg == "f1" or self.formerImg == "f2" or self.formerImg == "f3" or self.formerImg == "f4":
+        if self.formerImg == "f1":
+          self.foodPoint += random.randint(1,4)
+        elif self.formerImg == "f2":
+          self.foodPoint += random.randint(7,12)
+        elif self.formerImg == "f3":
+          self.foodPoint += random.randint(15,20)
+        elif self.formerImg == "f4":
+          self.foodPoint += random.randint(23,28)
         self.food += 1
         self.formerImg = "r"
-
-
 
 class Game:
   #pyfameの初期化
@@ -386,15 +395,13 @@ class Game:
   pygame.display.set_caption("sugoroku game")
 
   map = Map(HEIGHT, WIDTH, 30, screen)
-  player1 = Actor(map, 1, 1, "p1")
-  player2 = Actor(map, 1, 1, "p2")
-  player3 = Actor(map, 1, 1, "p3")
-  player4 = Actor(map, 1, 1, "p4")
+  player1 = Actor(map, 1, 1, "p1", "player1")
+  player2 = Actor(map, 1, 1, "p2", "player2")
+  player3 = Actor(map, 1, 1, "p3", "player3")
+  player4 = Actor(map, 1, 1, "p4", "player4")
   players = [player1, player2, player3, player4]
 
   def game(self):
-    
-
     for player in self.players:
       if self.oxygen > 0:
         if self.oxygen - (1 + player.food) < 0:
@@ -402,7 +409,7 @@ class Game:
         else:
           self.oxygen -= (1 + player.food)
           dice = random.randint(3, 8) - player.food
-          self.map.draw("Dice:" + str(dice) + "   food:" + str(player.food) + "   oxygen:" + str(self.oxygen), 20, 20)
+          self.map.draw("Dice:" + str(dice) + "   oxygen:" + str(self.oxygen), str(player.playerName) + "   food:" + str(player.food), 20, 20, 20, 60)
 
       elif self.oxygen  <= 0:
         self.runnning = False
@@ -417,17 +424,17 @@ class Game:
           break
         player.keyMove()
         dice = i - 1
-        self.map.draw("Dice:" + str(dice) + "   food:" + str(player.food) + "   oxygen:" + str(self.oxygen), 20, 20)
+        self.map.draw("Dice:" + str(dice) + "   oxygen:" + str(self.oxygen), str(player.playerName) + "   food:" + str(player.food), 20, 20, 20, 60)
       if player.goal == False:
         if player.formerImg == "r":
-          self.map.draw("dump?[y/n]" + "   food:" + str(player.food) + "   oxygen:" + str(self.oxygen), 20, 20)
+          self.map.draw("dump?[y/n]" + "   oxygen:" + str(self.oxygen), str(player.playerName) + "   food:" + str(player.food), 20, 20, 20, 60)
         else:
-          self.map.draw("eat?[y/n]" + "   food:" + str(player.food) + "   oxygen:" + str(self.oxygen), 20, 20)
-      
+          self.map.draw("eat?[y/n]" + "   oxygen:" + str(self.oxygen), str(player.playerName) + "   food:" + str(player.food), 20, 20, 20, 60)
       if player.goal == False:
         player.getFood()
 
 def main():
+  playerPoint = []
   # オブジェクトの作成
   game = Game()
 
@@ -435,6 +442,10 @@ def main():
     game.game()
     if game.runnning == False:
       break
+
+  for player in game.players:
+    playerPoint.append(player.foodPoint)
+
 
 if __name__ == "__main__":
   main()
