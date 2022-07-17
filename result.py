@@ -27,10 +27,10 @@ def result(pointPlayer1, pointPlayer2, pointPlayer3, pointPlayer4):
       text2 = font.render("player2", True, (255,255,255))
       text3 = font.render("player3", True, (255,255,255))
       text4 = font.render("player4", True, (255,255,255))
-      score = font.render(str(pointPlayer1), True, (255,255,255))
-      score2 = font.render(str(pointPlayer2), True, (255,255,255))
-      score3 = font.render(str(pointPlayer3), True, (255,255,255))
-      score4 = font.render(str(pointPlayer4), True, (255,255,255))
+      score = font.render(str(pointPlayer1)+"point", True, (255,255,255))
+      score2 = font.render(str(pointPlayer2)+"point", True, (255,255,255))
+      score3 = font.render(str(pointPlayer3)+"point", True, (255,255,255))
+      score4 = font.render(str(pointPlayer4)+"point", True, (255,255,255))
 
       # 文字の出力、座標
       screen.blit(text, (40, 40))
@@ -45,4 +45,4 @@ def result(pointPlayer1, pointPlayer2, pointPlayer3, pointPlayer4):
       # 画面を再描画
       pygame.display.update()
 #resultの実行
-# result(100, 120, 60, 40)
+result(100, 120, 60, 40)
