@@ -73,8 +73,10 @@ class Map:
   # マップを描画
   def draw(self, gameInfo, playerInfo, positionText1X, positionText1Y, positionText2X, positionText2Y):
 
+    #文字を描画
     self.drawString(gameInfo, playerInfo, positionText1X, positionText1Y, positionText2X, positionText2Y)
 
+    # ウィンドウに画像を何枚画像張れるかの値
     maxWidth = self.height // self.tileSize
     maxHeight = self.width // self.tileSize
 
@@ -89,8 +91,11 @@ class Map:
 
       # タイル画像を画面に描画
       self.screen.blit(img, (i * self.tileSize, j * self.tileSize + 90))
+
+    #ウィンドウを再描画
     pygame.display.update()
   
+  # 文字を描画
   def drawString(self, gameInfo, playerInfo, positionText1X, positionText1Y, positionText2X, positionText2Y):
     self.screen.fill((0,0,0))
     font = pygame.font.Font(None, 30)
@@ -112,13 +117,19 @@ class Actor:
     self.y = y
     self.pNumber = pNumber
     self.playerName = playerName
-
+  
+  # 押した矢印キーの向きにplayerが動く
   def keyMove(self):
+
+    # 間隔を空けないと，連続してキーが入力される
     time.sleep(0.3)
     e = keyboard.read_key()
+
+    # バックスペースでシステム終了
     if e == "backspace":
       sys.exit()
-
+    
+    # 上に移動するとき
     if e == "up":
       flag = False
       if self.map.mapData[self.y - 1][self.x] == "p1" or self.map.mapData[self.y - 1][self.x] == "p2" or self.map.mapData[self.y - 1][self.x] == "p3" or self.map.mapData[self.y - 1][self.x] == "p4":
@@ -174,7 +185,8 @@ class Actor:
         self.formerImg = self.map.mapData[self.y - 1][self.x]
         self.y -= 1
         self.map.mapData[self.y][self.x] = self.pNumber
-
+    
+    # 下に移動する時
     elif e == "down":
       flag = False
       if self.map.mapData[self.y + 1][self.x] == "p1" or self.map.mapData[self.y + 1][self.x] == "p2" or self.map.mapData[self.y + 1][self.x] == "p3" or self.map.mapData[self.y + 1][self.x] == "p4":
@@ -230,7 +242,8 @@ class Actor:
         self.formerImg = self.map.mapData[self.y + 1][self.x]
         self.y += 1
         self.map.mapData[self.y][self.x] = self.pNumber
-
+    
+    # 左に移動するとき
     elif e == "left":
       flag = False
       if self.map.mapData[self.y][self.x - 1] == "p1" or self.map.mapData[self.y][self.x - 1] == "p2" or self.map.mapData[self.y][self.x - 1] == "p3" or self.map.mapData[self.y][self.x - 1] == "p4":
@@ -253,11 +266,9 @@ class Actor:
             self.map.mapData[self.y][self.x] = self.formerImg
             self.goal = True
             break
-
         # 上に別プレイヤーがいる時
         for i in range(1, 10):
           if flag == True:
-            print("aaa")
             break
           elif self.map.mapData[self.y - i][self.x] == "w":
             self.y = self.y - i + 1
@@ -295,7 +306,8 @@ class Actor:
         self.formerImg = self.map.mapData[self.y][self.x - 1]
         self.x -= 1
         self.map.mapData[self.y][self.x] = self.pNumber
-
+    
+    # 右に移動するとき
     elif e == "right":
       flag = False
       if self.map.mapData[self.y][self.x + 1] == "p1" or self.map.mapData[self.y][self.x + 1] == "p2" or self.map.mapData[self.y][self.x + 1] == "p3" or self.map.mapData[self.y][self.x + 1] == "p4":
@@ -317,7 +329,6 @@ class Actor:
         # 上に別プレイヤーがいる時
         for i in range(1, 10):
           if flag == True:
-            print("break")
             break
           elif self.map.mapData[self.y - i][self.x] == "w":
             self.y = self.y - i + 1
@@ -353,40 +364,46 @@ class Actor:
         self.x += 1
         self.map.mapData[self.y][self.x] = self.pNumber
 
+  # 食べ物を拾うか捨てるか判定する関数
   def getFood(self):
+
+    # 間を空けないとキーが連続して入力される
     time.sleep(0.3)
     e = keyboard.read_key()
+
+    # バックスペースでシステム終了
     if e == "backspace":
       sys.exit()
-
+    
+    # 食べ物を拾うか捨てる
     elif e == "y":
+
+      # 食べ物を捨てる時
       if self.formerImg == "r":
         if self.food > 0:
           self.foodInfo.sort()
           dumpFood = self.foodInfo[0]
           self.foodInfo.pop(0)
 
+          # 捨てた食べ物のポイント分foodPointを減点
           if dumpFood == 1:
             if self.foodPoint - random.randint(1,4) < 0:
               self.foodPoint = 0
             else:
               self.foodPoint -= random.randint(1,4)
             self.formerImg = "f1"
-
           elif dumpFood == 2:
             if self.foodPoint - random.randint(7,12) < 0:
               self.foodPoint = 0
             else:
               self.foodPoint -= random.randint(7,12)
             self.formerImg = "f2"
-
           elif dumpFood == 3:
             if self.foodPoint - random.randint(15,20) < 0:
               self.foodPoint = 0
             else:
               self.foodPoint -= random.randint(15,20)
             self.formerImg = "f3"
-
           elif dumpFood == 4:
             if self.foodPoint - random.randint(23,28) < 0:
               self.foodPoint = 0
@@ -394,8 +411,11 @@ class Actor:
               self.foodPoint -= random.randint(23,28)
             self.formerImg = "f4"
           self.food -= 1
-          
+      
+      # 食べ物を拾う時
       elif self.formerImg == "f1" or self.formerImg == "f2" or self.formerImg == "f3" or self.formerImg == "f4":
+
+        # 拾った食べ物のポイント分foodPointに加点
         if self.formerImg == "f1":
           self.foodPoint += random.randint(1,4)
           self.foodInfo.append(1)
@@ -418,14 +438,17 @@ class Game:
   # 画面サイズ
   HEIGHT = 450
   WIDTH = 450
+  screen = pygame.display.set_mode((HEIGHT, WIDTH),  pygame.NOFRAME )
+
   oxygen = 30
   goalPeople = 0
   runnning = True
-  screen = pygame.display.set_mode((HEIGHT, WIDTH))
+  playerPoint = []
 
   #画面タイトル設定
   pygame.display.set_caption("sugoroku game")
 
+  # オブジェクト生成
   map = Map(HEIGHT, WIDTH, 30, screen)
   player1 = Actor(map, 1, 1, "p1", "player1")
   player2 = Actor(map, 1, 1, "p2", "player2")
@@ -435,30 +458,40 @@ class Game:
 
   def game(self):
     for player in self.players:
+      # oxygenがのこってたらそのプレイヤーのターンを進める
       if self.oxygen > 0:
         if self.oxygen - (1 + player.food) < 0:
           self.oxygen = 0
-          print("ccc")
         else:
           self.oxygen -= (1 + player.food)
-          print("bbbb")
         dice = random.randint(3, 8) - player.food
         self.map.draw("Dice:" + str(dice) + "   oxygen:" + str(self.oxygen), str(player.playerName) + "   food:" + str(player.food), 20, 20, 20, 60)
 
+      # oxygenがなかったらゲーム終了
       elif self.oxygen  <= 0:
         self.runnning = False
         break
       
+
       for i in range(dice, 0, -1):
+        # 4人ともゴールしたらゲーム終了
         if self.goalPeople == 4:
           self.runnning = False
           break
+
+        # ゴールした人数カウント
         elif player.goal == True:
           self.goalPeople += 1
           break
+
+        # 押したキーの方向に進む
         player.keyMove()
+
+        # 行動するごとに残りの行動回数，残りの酸素などの情報を再描画
         dice = i - 1
         self.map.draw("Dice:" + str(dice) + "   oxygen:" + str(self.oxygen), str(player.playerName) + "   food:" + str(player.food), 20, 20, 20, 60)
+      
+      # プレイヤーがゴールしてないならば食べ物を拾うか捨てるか聞く
       if player.goal == False:
         if player.formerImg == "r":
           self.map.draw("dump?[y/n]" + "   oxygen:" + str(self.oxygen), str(player.playerName) + "   food:" + str(player.food), 20, 20, 20, 60)
@@ -467,20 +500,27 @@ class Game:
       if player.goal == False:
         player.getFood()
 
+  def result(self):
+    # 最終ポイントをplayerPointにまとめる
+    for player in self.players:
+      if player.goal == True:
+        self.playerPoint.append(player.foodPoint)
+      # ゴール出来てない人の得点は0
+      else:
+        self.playerPoint.append(0)
+    
+    # 結果画面を表示
+    result.result(self.playerPoint[0], self.playerPoint[1], self.playerPoint[2], self.playerPoint[3])
+
 def main():
-  playerPoint = []
   # オブジェクトの作成
   game = Game()
 
   while True:
     game.game()
     if game.runnning == False:
+      game.result()
       break
-
-  for player in game.players:
-    playerPoint.append(player.foodPoint)
-
-  result.result(playerPoint[0], playerPoint[1], playerPoint[2], playerPoint[3])
 
 if __name__ == "__main__":
   main()
