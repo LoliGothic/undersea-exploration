@@ -1,4 +1,3 @@
-from email.policy import default
 import sys
 import pygame
 import keyboard
@@ -9,7 +8,7 @@ class Map:
   # マップ
   mapData = [
     ["w", "w", "w", "w", "w", "w", "w", "w", "w", "w", "w", "w", "w", "w", "w"],
-    ["w", "s", "p1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "w", "w", "w", "w"],
+    ["w", "s", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "w", "w", "w", "w"],
     ["w", "w", "w", "w", "w", "w", "w", "w", "w", "w", "f2", "w", "w", "w", "w"],
     ["w", "w", "w", "w", "w", "w", "w", "w", "w", "w", "f2", "w", "w", "w", "w"],
     ["w", "w", "w", "f3", "f3", "f2", "f2", "f2", "f2", "f2", "f2", "w", "w", "w", "w"],
@@ -32,6 +31,12 @@ class Map:
   imgRoad = pygame.transform.scale(imgGigRoad, (30, 30))
   imgBigPlayer1 = pygame.image.load("./img/player1.png")
   imgPlayer1 = pygame.transform.scale(imgBigPlayer1, (30, 31))
+  imgBigPlayer2 = pygame.image.load("./img/player2.png")
+  imgPlayer2 = pygame.transform.scale(imgBigPlayer2, (30, 31))
+  imgBigPlayer3 = pygame.image.load("./img/player3.png")
+  imgPlayer3 = pygame.transform.scale(imgBigPlayer3, (30, 31))
+  imgBigPlayer4 = pygame.image.load("./img/player4.png")
+  imgPlayer4 = pygame.transform.scale(imgBigPlayer4, (30, 31))
   imgBigFood1 = pygame.image.load("./img/f1.png")
   imgFood1 = pygame.transform.scale(imgBigFood1, (30, 31))
   imgBigFood2 = pygame.image.load("./img/f2.png")
@@ -48,6 +53,9 @@ class Map:
   "w": imgWater,
   "r": imgRoad,
   "p1": imgPlayer1,
+  "p2": imgPlayer2,
+  "p3": imgPlayer3,
+  "p4": imgPlayer4,
   "f1": imgFood1,
   "f2": imgFood2,
   "f3": imgFood3,
@@ -91,65 +99,272 @@ class Map:
 class Actor:
   food = 0
   foodPoint = 0
-  formerImg = "f1"
+  formerImg = "s"
+  goal = False
 
-  def __init__(self, map, x, y):
+  def __init__(self, map, x, y, pNumber):
     self.map = map
     self.x = x
     self.y = y
+    self.pNumber = pNumber
 
   def keyMove(self):
-    time.sleep(0.5)
+    time.sleep(0.3)
     e = keyboard.read_key()
     if e == "backspace":
       sys.exit()
 
     if e == "up":
-      if self.map.mapData[self.y - 1][self.x] == "w":
-        self.map.mapData[self.y][self.x] = "p1"
+      flag = False
+      if self.map.mapData[self.y - 1][self.x] == "p1" or self.map.mapData[self.y - 1][self.x] == "p2" or self.map.mapData[self.y - 1][self.x] == "p3" or self.map.mapData[self.y - 1][self.x] == "p4":
+        # 上に別プレイヤーがいる時
+        for i in range(1, 10):
+          if self.map.mapData[self.y - i][self.x] == "w":
+            saveX = self.x
+            saveY = self.y
+            self.y = self.y - i + 1
+            self.x = self.x
+            break
+          elif self.map.mapData[self.y - i][self.x] == "f1" or self.map.mapData[self.y - i][self.x] == "f2" or self.map.mapData[self.y - i][self.x] == "f3" or self.map.mapData[self.y - i][self.x] == "f4" or self.map.mapData[self.y - i][self.x] == "r":
+            self.map.mapData[self.y][self.x] = self.formerImg
+            self.formerImg = self.map.mapData[self.y - i][self.x]
+            self.y -= i
+            self.map.mapData[self.y][self.x] = self.pNumber
+            flag = True
+            break
+        # 左に別プレイヤーがいる時
+        for i in range(1, 10):
+          if flag == True:
+            break
+          if self.map.mapData[self.y][self.x - i] == "w":
+            self.y = self.y
+            self.x = self.x - i + 1
+            break
+          elif self.map.mapData[self.y][self.x - i] == "f1" or self.map.mapData[self.y][self.x - i] == "f2" or self.map.mapData[self.y][self.x - i] == "f3" or self.map.mapData[self.y][self.x - i] == "f4" or self.map.mapData[self.y][self.x - i] == "r":
+            self.map.mapData[saveY][saveX] = self.formerImg
+            self.formerImg = self.map.mapData[self.y][self.x - i]
+            self.x -= i
+            self.map.mapData[self.y][self.x] = self.pNumber
+            flag = True
+            break
+        # 右に別プレイヤーがいる時
+        for i in range(1, 10):
+          if flag == True:
+            break
+          if self.map.mapData[self.y][self.x + i] == "w":
+            self.y = self.y
+            self.x = self.x + i - 1
+            break
+          elif self.map.mapData[self.y][self.x + i] == "f1" or self.map.mapData[self.y][self.x + i] == "f2" or self.map.mapData[self.y][self.x + i] == "f3" or self.map.mapData[self.y][self.x + i] == "f4" or self.map.mapData[self.y][self.x + i] == "r":
+            self.map.mapData[saveY][saveX] = self.formerImg
+            self.formerImg = self.map.mapData[self.y][self.x + i]
+            self.x += i
+            self.map.mapData[self.y][self.x] = self.pNumber
+            flag = True
+            break
+      elif self.map.mapData[self.y - 1][self.x] == "w":
+        self.map.mapData[self.y][self.x] = self.pNumber
       else:
         self.map.mapData[self.y][self.x] = self.formerImg
         self.formerImg = self.map.mapData[self.y - 1][self.x]
         self.y -= 1
-        self.map.mapData[self.y][self.x] = "p1"
+        self.map.mapData[self.y][self.x] = self.pNumber
 
     elif e == "down":
-      if self.map.mapData[self.y + 1][self.x] == "w":
-        self.map.mapData[self.y][self.x] = "p1"
+      flag = False
+      if self.map.mapData[self.y + 1][self.x] == "p1" or self.map.mapData[self.y + 1][self.x] == "p2" or self.map.mapData[self.y + 1][self.x] == "p3" or self.map.mapData[self.y + 1][self.x] == "p4":
+        # 下に別のプレイヤーがいる時
+        for i in range(1, 10):
+          if self.map.mapData[self.y + i][self.x] == "w":
+            saveX = self.x
+            saveY = self.y
+            self.y = self.y + i - 1
+            self.x = self.x
+            break
+          elif self.map.mapData[self.y + i][self.x] == "f1" or self.map.mapData[self.y + i][self.x] == "f2" or self.map.mapData[self.y + i][self.x] == "f3" or self.map.mapData[self.y + i][self.x] == "f4" or self.map.mapData[self.y + i][self.x] == "r":
+            self.map.mapData[self.y][self.x] = self.formerImg
+            self.formerImg = self.map.mapData[self.y + i][self.x]
+            self.y += i
+            self.map.mapData[self.y][self.x] = self.pNumber
+            flag = True
+            break
+        # 左に別プレイヤーがいる時
+        for i in range(1, 10):
+          if flag == True:
+            break
+          if self.map.mapData[self.y][self.x - i] == "w":
+            self.y = self.y
+            self.x = self.x - i + 1 
+            break
+          elif self.map.mapData[self.y][self.x - i] == "f1" or self.map.mapData[self.y][self.x - i] == "f2" or self.map.mapData[self.y][self.x - i] == "f3" or self.map.mapData[self.y][self.x - i] == "f4" or self.map.mapData[self.y][self.x - i] == "r":
+            self.map.mapData[saveY][saveX] = self.formerImg
+            self.formerImg = self.map.mapData[self.y][self.x - i]
+            self.x -= i
+            self.map.mapData[self.y][self.x] = self.pNumber
+            flag = True
+            break
+        # 右に別プレイヤーがいる時
+        for i in range(1, 10):
+          if flag == True:
+            break
+          elif self.map.mapData[self.y][self.x + i] == "w":
+            self.y = self.y
+            self.x = self.x + i - 1
+            break
+          elif self.map.mapData[self.y][self.x + i] == "f1" or self.map.mapData[self.y][self.x + i] == "f2" or self.map.mapData[self.y][self.x + i] == "f3" or self.map.mapData[self.y][self.x + i] == "f4" or self.map.mapData[self.y][self.x + i] == "r":
+            self.map.mapData[saveY][saveX] = self.formerImg
+            self.formerImg = self.map.mapData[self.y][self.x + i]
+            self.x += i
+            self.map.mapData[self.y][self.x] = self.pNumber
+            flag = True
+            break
+      elif self.map.mapData[self.y + 1][self.x] == "w":
+        self.map.mapData[self.y][self.x] = self.pNumber
       else:
         self.map.mapData[self.y][self.x] = self.formerImg
         self.formerImg = self.map.mapData[self.y + 1][self.x]
         self.y += 1
-        self.map.mapData[self.y][self.x] = "p1"
+        self.map.mapData[self.y][self.x] = self.pNumber
 
     elif e == "left":
-      if self.map.mapData[self.y][self.x - 1] == "w":
-        self.map.mapData[self.y][self.x] = "p1"
+      flag = False
+      if self.map.mapData[self.y][self.x - 1] == "p1" or self.map.mapData[self.y][self.x - 1] == "p2" or self.map.mapData[self.y][self.x - 1] == "p3" or self.map.mapData[self.y][self.x - 1] == "p4":
+        # 左に別プレイヤーがいる時
+        for i in range(1, 10):
+          if self.map.mapData[self.y][self.x - i] == "w":
+            saveX = self.x
+            saveY = self.y
+            self.y = self.y
+            self.x = self.x - i + 1
+            break
+          elif self.map.mapData[self.y][self.x - i] == "f1" or self.map.mapData[self.y][self.x - i] == "f2" or self.map.mapData[self.y][self.x - i] == "f3" or self.map.mapData[self.y][self.x - i] == "f4" or self.map.mapData[self.y][self.x - i] == "r":
+            self.map.mapData[self.y][self.x] = self.formerImg
+            self.formerImg = self.map.mapData[self.y][self.x - i]
+            self.x -= i
+            self.map.mapData[self.y][self.x] = self.pNumber
+            flag = True
+            print(self.y)
+            print(self.x)
+            print(i)
+            break
+          elif self.map.mapData[self.y][self.x - i] == "s":
+            self.map.mapData[self.y][self.x] = self.formerImg
+            self.formerImg = self.map.mapData[self.y][self.x - i]
+            self.goal = True
+
+        # 上に別プレイヤーがいる時
+        for i in range(1, 10):
+          if flag == True:
+            print("aaa")
+            break
+          elif self.map.mapData[self.y - i][self.x] == "w":
+            self.y = self.y - i + 1
+            self.x = self.x
+            break
+          elif self.map.mapData[self.y - i][self.x] == "f1" or self.map.mapData[self.y - i][self.x] == "f2" or self.map.mapData[self.y - i][self.x] == "f3" or self.map.mapData[self.y - i][self.x] == "f4" or self.map.mapData[self.y - i][self.x] == "r":
+            self.map.mapData[saveY][saveX] = self.formerImg
+            self.formerImg = self.map.mapData[self.y - i][self.x]
+            self.y -= i
+            self.map.mapData[self.y][self.x] = self.pNumber
+            flag = True
+            break
+        # 下に別プレイヤーがいる時
+        for i in range(1, 10):
+          if flag == True:
+            print("aa")
+            break
+          elif self.map.mapData[self.y + i][self.x] == "w":
+            self.y = self.y + i - 1
+            self.x = self.x
+            break
+          elif self.map.mapData[self.y + i][self.x] == "f1" or self.map.mapData[self.y + i][self.x] == "f2" or self.map.mapData[self.y + i][self.x] == "f3" or self.map.mapData[self.y + i][self.x] == "f4" or self.map.mapData[self.y + i][self.x] == "r":
+            self.map.mapData[saveY][saveX] = self.formerImg
+            self.formerImg = self.map.mapData[self.y + i][self.x]
+            self.y += i
+            self.map.mapData[self.y][self.x] = self.pNumber
+            flag = True
+            break
+      elif self.map.mapData[self.y][self.x - 1] == "w":
+        self.map.mapData[self.y][self.x] = self.pNumber
       elif self.map.mapData[self.y][self.x - 1] == "s":
-        sys.exit()
+        self.map.mapData[self.y][self.x] = self.formerImg
+        self.goal = True
       else:
         self.map.mapData[self.y][self.x] = self.formerImg
         self.formerImg = self.map.mapData[self.y][self.x - 1]
         self.x -= 1
-        self.map.mapData[self.y][self.x] = "p1"
+        self.map.mapData[self.y][self.x] = self.pNumber
 
     elif e == "right":
-      if self.map.mapData[self.y][self.x + 1] == "w":
-        self.map.mapData[self.y][self.x] = "p1"
+      flag = False
+      if self.map.mapData[self.y][self.x + 1] == "p1" or self.map.mapData[self.y][self.x + 1] == "p2" or self.map.mapData[self.y][self.x + 1] == "p3" or self.map.mapData[self.y][self.x + 1] == "p4":
+        # 右に別プレイヤーがいる時
+        for i in range(1, 10):
+          if self.map.mapData[self.y][self.x + i] == "w":
+            saveX = self.x
+            saveY = self.y
+            self.y = self.y
+            self.x = self.x + i - 1
+            break
+          elif self.map.mapData[self.y][self.x + i] == "f1" or self.map.mapData[self.y][self.x + i] == "f2" or self.map.mapData[self.y][self.x + i] == "f3" or self.map.mapData[self.y][self.x + i] == "f4" or self.map.mapData[self.y][self.x + i] == "r":
+            self.map.mapData[self.y][self.x] = self.formerImg
+            self.formerImg = self.map.mapData[self.y][self.x + i]
+            self.x += i
+            self.map.mapData[self.y][self.x] = self.pNumber
+            flag = True
+            break
+        # 上に別プレイヤーがいる時
+        for i in range(1, 10):
+          if flag == True:
+            print("break")
+            break
+          elif self.map.mapData[self.y - i][self.x] == "w":
+            self.y = self.y - i + 1
+            self.x = self.x
+            break
+          elif self.map.mapData[self.y - i][self.x] == "f1" or self.map.mapData[self.y - i][self.x] == "f2" or self.map.mapData[self.y - i][self.x] == "f3" or self.map.mapData[self.y - i][self.x] == "f4" or self.map.mapData[self.y - i][self.x] == "r":
+            self.map.mapData[saveY][saveX] = self.formerImg
+            self.formerImg = self.map.mapData[self.y - i][self.x]
+            self.y -= i
+            self.map.mapData[self.y][self.x] = self.pNumber
+            flag = True
+            break
+        # 下に別プレイヤーがいる時
+        for i in range(1, 10):
+          if flag == True:
+            break
+          elif self.map.mapData[self.y + i][self.x] == "w":
+            self.y = self.y + i - 1
+            self.x = self.x
+            break
+          elif self.map.mapData[self.y + i][self.x] == "f1" or self.map.mapData[self.y + i][self.x] == "f2" or self.map.mapData[self.y + i][self.x] == "f3" or self.map.mapData[self.y + i][self.x] == "f4" or self.map.mapData[self.y + i][self.x] == "r":
+            self.map.mapData[saveY][saveX] = self.formerImg
+            self.formerImg = self.map.mapData[self.y + i][self.x]
+            self.y += i
+            self.map.mapData[self.y][self.x] = self.pNumber
+            flag = True
+            break
+      elif self.map.mapData[self.y][self.x + 1] == "w":
+        self.map.mapData[self.y][self.x] = self.pNumber
       else:
         self.map.mapData[self.y][self.x] = self.formerImg
         self.formerImg = self.map.mapData[self.y][self.x + 1]
         self.x += 1
-        self.map.mapData[self.y][self.x] = "p1"
+        self.map.mapData[self.y][self.x] = self.pNumber
 
   def getFood(self):
-    time.sleep(0.5)
+    time.sleep(0.3)
     e = keyboard.read_key()
     if e == "backspace":
       sys.exit()
-      
-    if e == "y":
-      if self.formerImg == "f1" or self.formerImg == "f2" or self.formerImg == "f3" or self.formerImg == "f4":
+
+    elif e == "y":
+      if self.formerImg == "r":
+        if self.food > 0:
+          self.food -= 1
+          self.formerImg = "f1"
+        
+      elif self.formerImg == "f1" or self.formerImg == "f2" or self.formerImg == "f3" or self.formerImg == "f4":
         self.food += 1
         self.formerImg = "r"
 
@@ -163,31 +378,54 @@ class Game:
   HEIGHT = 450
   WIDTH = 450
   oxygen = 30
+  goalPeople = 0
+  runnning = True
   screen = pygame.display.set_mode((HEIGHT, WIDTH))
 
   #画面タイトル設定
   pygame.display.set_caption("sugoroku game")
 
   map = Map(HEIGHT, WIDTH, 30, screen)
-  player1 = Actor(map, 2, 1)
-  
+  player1 = Actor(map, 1, 1, "p1")
+  player2 = Actor(map, 1, 1, "p2")
+  player3 = Actor(map, 1, 1, "p3")
+  player4 = Actor(map, 1, 1, "p4")
+  players = [player1, player2, player3, player4]
+
   def game(self):
-    if(self.oxygen - self.player1.food <= 0):
-      sys.exit()
-    else:
-      self.oxygen -= (1 + self.player1.food)
+    
+
+    for player in self.players:
+      if self.oxygen > 0:
+        if self.oxygen - (1 + player.food) < 0:
+          self.oxgen = 0
+        else:
+          self.oxygen -= (1 + player.food)
+          dice = random.randint(3, 8) - player.food
+          self.map.draw("Dice:" + str(dice) + "   food:" + str(player.food) + "   oxygen:" + str(self.oxygen), 20, 20)
+
+      elif self.oxygen  <= 0:
+        self.runnning = False
+        break
       
-    dice = random.randint(3, 8) - self.player1.food
-    self.map.draw("Dice:" + str(dice) + "   food:" + str(self.player1.food) + "   oxygen:" + str(self.oxygen), 20, 20)
-
-    for i in range(dice, 0, -1):
-      self.player1.keyMove()
-      dice = i - 1
-      self.map.draw("Dice:" + str(dice) + "   food:" + str(self.player1.food) + "   oxygen:" + str(self.oxygen), 20, 20)
-
-    self.map.draw("eat?[y/n]" + "   food:" + str(self.player1.food) + "   oxygen:" + str(self.oxygen), 20, 20)
-
-    self.player1.getFood()
+      for i in range(dice, 0, -1):
+        if self.goalPeople == 4:
+          self.runnning = False
+          break
+        elif player.goal == True:
+          self.goalPeople += 1
+          break
+        player.keyMove()
+        dice = i - 1
+        self.map.draw("Dice:" + str(dice) + "   food:" + str(player.food) + "   oxygen:" + str(self.oxygen), 20, 20)
+      if player.goal == False:
+        if player.formerImg == "r":
+          self.map.draw("dump?[y/n]" + "   food:" + str(player.food) + "   oxygen:" + str(self.oxygen), 20, 20)
+        else:
+          self.map.draw("eat?[y/n]" + "   food:" + str(player.food) + "   oxygen:" + str(self.oxygen), 20, 20)
+      
+      if player.goal == False:
+        player.getFood()
 
 def main():
   # オブジェクトの作成
@@ -195,6 +433,8 @@ def main():
 
   while True:
     game.game()
+    if game.runnning == False:
+      break
 
 if __name__ == "__main__":
   main()
