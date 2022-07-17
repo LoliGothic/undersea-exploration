@@ -366,7 +366,7 @@ class Actor:
       if self.formerImg == "r":
         if self.food > 0:
           self.foodInfo.sort()
-          dumpFood = self.foodInfo(0)
+          dumpFood = self.foodInfo[0]
           self.foodInfo.pop(0)
 
           if dumpFood == 1:
@@ -383,7 +383,6 @@ class Actor:
             self.formerImg = "f4"
           self.food -= 1
           
-        
       elif self.formerImg == "f1" or self.formerImg == "f2" or self.formerImg == "f3" or self.formerImg == "f4":
         if self.formerImg == "f1":
           self.foodPoint += random.randint(1,4)
