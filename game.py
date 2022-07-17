@@ -248,14 +248,11 @@ class Actor:
             self.x -= i
             self.map.mapData[self.y][self.x] = self.pNumber
             flag = True
-            print(self.y)
-            print(self.x)
-            print(i)
             break
           elif self.map.mapData[self.y][self.x - i] == "s":
             self.map.mapData[self.y][self.x] = self.formerImg
-            self.formerImg = self.map.mapData[self.y][self.x - i]
             self.goal = True
+            break
 
         # 上に別プレイヤーがいる時
         for i in range(1, 10):
