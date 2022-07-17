@@ -367,16 +367,31 @@ class Actor:
           self.foodInfo.pop(0)
 
           if dumpFood == 1:
-            self.foodPoint -= random.randint(1,4)
+            if self.foodPoint - random.randint(1,4) < 0:
+              self.foodPoint = 0
+            else:
+              self.foodPoint -= random.randint(1,4)
             self.formerImg = "f1"
+
           elif dumpFood == 2:
-            self.foodPoint -= random.randint(7,12)
+            if self.foodPoint - random.randint(7,12) < 0:
+              self.foodPoint = 0
+            else:
+              self.foodPoint -= random.randint(7,12)
             self.formerImg = "f2"
+
           elif dumpFood == 3:
-            self.foodPoint -= random.randint(15,20)
+            if self.foodPoint - random.randint(15,20) < 0:
+              self.foodPoint = 0
+            else:
+              self.foodPoint -= random.randint(15,20)
             self.formerImg = "f3"
+
           elif dumpFood == 4:
-            self.foodPoint -= random.randint(23,28)
+            if self.foodPoint - random.randint(23,28) < 0:
+              self.foodPoint = 0
+            else:
+              self.foodPoint -= random.randint(23,28)
             self.formerImg = "f4"
           self.food -= 1
           
@@ -425,8 +440,8 @@ class Game:
           self.oxgen = 0
         else:
           self.oxygen -= (1 + player.food)
-          dice = random.randint(3, 8) - player.food
-          self.map.draw("Dice:" + str(dice) + "   oxygen:" + str(self.oxygen), str(player.playerName) + "   food:" + str(player.food), 20, 20, 20, 60)
+        dice = random.randint(3, 8) - player.food
+        self.map.draw("Dice:" + str(dice) + "   oxygen:" + str(self.oxygen), str(player.playerName) + "   food:" + str(player.food), 20, 20, 20, 60)
 
       elif self.oxygen  <= 0:
         self.runnning = False
