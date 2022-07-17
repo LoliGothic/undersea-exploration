@@ -1,4 +1,4 @@
-# pygameを用いたすごろく
+# sugoroku
 
 ## 実行までの流れ
 1. git cloneでcloneする
