@@ -3,6 +3,7 @@ import pygame
 import keyboard
 import time
 import random
+import result
 
 class Map:
   # マップ
@@ -101,6 +102,7 @@ class Map:
 class Actor:
   food = 0
   foodPoint = 0
+  foodInfo = []
   formerImg = "s"
   goal = False
 
@@ -274,7 +276,6 @@ class Actor:
         # 下に別プレイヤーがいる時
         for i in range(1, 10):
           if flag == True:
-            print("aa")
             break
           elif self.map.mapData[self.y + i][self.x] == "w":
             self.y = self.y + i - 1
@@ -364,18 +365,38 @@ class Actor:
     elif e == "y":
       if self.formerImg == "r":
         if self.food > 0:
+          self.foodInfo.sort()
+          dumpFood = self.foodInfo(0)
+          self.foodInfo.pop(0)
+
+          if dumpFood == 1:
+            self.foodPoint -= random.randint(1,4)
+            self.formerImg = "f1"
+          elif dumpFood == 2:
+            self.foodPoint -= random.randint(7,12)
+            self.formerImg = "f2"
+          elif dumpFood == 3:
+            self.foodPoint -= random.randint(15,20)
+            self.formerImg = "f3"
+          elif dumpFood == 4:
+            self.foodPoint -= random.randint(23,28)
+            self.formerImg = "f4"
           self.food -= 1
-          self.formerImg = "f1"
+          
         
       elif self.formerImg == "f1" or self.formerImg == "f2" or self.formerImg == "f3" or self.formerImg == "f4":
         if self.formerImg == "f1":
           self.foodPoint += random.randint(1,4)
+          self.foodInfo.append(1)
         elif self.formerImg == "f2":
           self.foodPoint += random.randint(7,12)
+          self.foodInfo.append(2)
         elif self.formerImg == "f3":
           self.foodPoint += random.randint(15,20)
+          self.foodInfo.append(3)
         elif self.formerImg == "f4":
           self.foodPoint += random.randint(23,28)
+          self.foodInfo.append(4)
         self.food += 1
         self.formerImg = "r"
 
@@ -446,6 +467,7 @@ def main():
   for player in game.players:
     playerPoint.append(player.foodPoint)
 
+  result.result(playerPoint[0], playerPoint[1], playerPoint[2], playerPoint[3])
 
 if __name__ == "__main__":
   main()
