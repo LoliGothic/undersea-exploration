@@ -45,4 +45,4 @@ def result(pointPlayer1, pointPlayer2, pointPlayer3, pointPlayer4):
       # 画面を再描画
       pygame.display.update()
 #resultの実行
-result(100, 120, 60, 40)
+# result(100, 120, 60, 40)
